@@ -8,6 +8,11 @@ pipeline {
                     image 'node:18-alpine'
                     reuseNode true
                 }
+            steps {
+                sh '''
+                    test build/index.html
+                '''
+            }
             }
             steps {
                 sh '''
