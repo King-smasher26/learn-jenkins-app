@@ -31,8 +31,7 @@ pipeline {
                 sh '''
                     echo "test stage"
                     test build/index.html
-                    pwd 
-                    ls -la
+                    npm test
                 '''
             }
         }
