@@ -71,28 +71,28 @@ pipeline {
         }
             }
         }
-        stage('Deploy Staging') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                   sh '''
-                    echo 'this is the staging environment deploy'
-                    npm install netlify-cli node-jq
-                    node_modules/.bin/netlify --version
-                    echo 'Deploying to production - Site ID: $NETLIFY_SITE_ID'
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.txt
-                '''
-            script{
-                env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.txt",returnStdout: true)
-            }
-            }
-        }
-            stage('Staging E2E') {
+        // stage('Deploy Staging') {
+        //     agent {
+        //         docker {
+        //             image 'node:18-alpine'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //            sh '''
+        //             echo 'this is the staging environment deploy'
+        //             npm install netlify-cli node-jq
+        //             node_modules/.bin/netlify --version
+        //             echo 'Deploying to production - Site ID: $NETLIFY_SITE_ID'
+        //             node_modules/.bin/netlify status
+        //             node_modules/.bin/netlify deploy --dir=build --json > deploy-output.txt
+        //         '''
+        //     script{
+        //         env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.txt",returnStdout: true)
+        //     }
+        //     }
+        // }
+            stage('Deploy and E2E staging') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
@@ -104,6 +104,13 @@ pipeline {
             }
             steps {
                 sh '''
+                    echo 'this is the staging environment deploy'
+                    node --version
+                    npm install netlify-cli node-jq
+                    node_modules/.bin/netlify --version
+                    echo 'Deploying to production - Site ID: $NETLIFY_SITE_ID'
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.txt
                     echo 'playwright test for deployed website ... '
                     npx playwright test --reporter=html
                 '''
